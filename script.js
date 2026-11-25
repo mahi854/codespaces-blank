@@ -334,16 +334,35 @@ function showResult() {
   elements.result.hidden = false;
 }
 
+function setNavigationOpen(isOpen) {
+  elements.menuToggle.setAttribute("aria-expanded", String(isOpen));
+  elements.menuToggle.setAttribute("aria-label", isOpen ? "Close navigation" : "Open navigation");
+  elements.navLinks.classList.toggle("is-open", isOpen);
+}
+
 elements.menuToggle.addEventListener("click", () => {
   const isOpen = elements.menuToggle.getAttribute("aria-expanded") === "true";
-  elements.menuToggle.setAttribute("aria-expanded", String(!isOpen));
-  elements.navLinks.classList.toggle("is-open", !isOpen);
+  setNavigationOpen(!isOpen);
 });
 
 elements.navLinks.addEventListener("click", (event) => {
   if (event.target.closest("a")) {
-    elements.menuToggle.setAttribute("aria-expanded", "false");
-    elements.navLinks.classList.remove("is-open");
+    setNavigationOpen(false);
+  }
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && elements.menuToggle.getAttribute("aria-expanded") === "true") {
+    setNavigationOpen(false);
+    elements.menuToggle.focus();
+  }
+});
+
+document.addEventListener("click", (event) => {
+  const clickedOutsideNavigation = !elements.navLinks.contains(event.target)
+    && !elements.menuToggle.contains(event.target);
+  if (clickedOutsideNavigation && elements.menuToggle.getAttribute("aria-expanded") === "true") {
+    setNavigationOpen(false);
   }
 });
 
